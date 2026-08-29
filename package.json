@@ -5,11 +5,44 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder"
+    "build": "electron-builder --win portable",
+    "build:portable": "electron-builder --win portable --config.win.compression=maximum"
   },
-  "author": "Your Name",
+  "author": "Mohammad KhanAhmadi",
   "license": "MIT",
+  "build": {
+    "appId": "com.hamyar.app",
+    "productName": "Hamyar",
+    "artifactName": "Hamyar-Portable.exe",
+    "asar": true,
+    "compression": "maximum",
+    "files": [
+      "main.js",
+      "index.html",
+      "styles.css",
+      "renderer.js",
+      "package.json",
+      "assets/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "portable": {
+      "artifactName": "Hamyar-Portable.exe"
+    },
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    }
+  },
   "devDependencies": {
-    "electron": "^31.0.0"
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
   }
 }

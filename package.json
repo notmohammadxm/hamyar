@@ -1,0 +1,15 @@
+{
+  "name": "hamyar",
+  "version": "1.0.0",
+  "description": "برنامه همیار",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^31.0.0"
+  }
+}

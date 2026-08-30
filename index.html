@@ -1,18 +1,1275 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline';">
-  <title>همیار</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پنل آموزشی دانش‌آموز</title>
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet">
+<style>
+/* ================= پایه ================= */
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Vazir',Tahoma,sans-serif}
+:root{
+  --bg:#0e0e14;--bg-2:#0a0a0f;
+  --card:#15151e;--card-2:#1b1b26;--input:#101018;
+  --border:#262633;--border-2:#343442;
+  --gold:#d4af37;--gold-2:#f0d47c;--gold-3:#8f731c;
+  --text:#ece9e2;--muted:#9a97a5;--muted-2:#6d6a78;
+  --red:#e74c3c;--green:#2ecc71;--blue:#4a90e2;--purple:#9b59b6;--orange:#f39c12;--teal:#1abc9c;
+}
+body{
+  background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow:hidden;
+  background-image:
+    radial-gradient(circle at 15% 8%,rgba(212,175,55,.07) 0%,transparent 42%),
+    radial-gradient(circle at 85% 92%,rgba(212,175,55,.05) 0%,transparent 42%);
+}
+::selection{background:rgba(212,175,55,.35)}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--bg-2)}
+::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--gold-3)}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+input[type=number]{-moz-appearance:textfield}
+
+/* ================= آیکون‌ها ================= */
+.ic{width:17px;height:17px;flex-shrink:0}
+.ic-xs{width:14px;height:14px}
+.ic-xxs{width:11px;height:11px}
+
+/* ================= سایدبار ================= */
+.sidebar{
+  width:280px;background:linear-gradient(180deg,var(--card) 0%,var(--bg-2) 100%);
+  border-left:1px solid var(--border);padding:22px 14px;display:flex;flex-direction:column;
+  height:100vh;box-shadow:-4px 0 24px rgba(0,0,0,.3);z-index:10;
+}
+.logo{display:flex;align-items:center;gap:12px;padding:6px 10px 20px;border-bottom:1px solid var(--border);margin-bottom:20px}
+.logo-icon{
+  width:46px;height:46px;background:linear-gradient(135deg,var(--gold-2),var(--gold-3));
+  border-radius:13px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(212,175,55,.3);flex-shrink:0;
+}
+.logo-text h1{font-size:16px;color:var(--gold-2);font-weight:800}
+.logo-text p{font-size:11px;color:var(--muted);margin-top:3px}
+.nav-title{font-size:10.5px;color:var(--muted-2);padding:0 12px;margin-bottom:10px;letter-spacing:1px}
+.nav{display:flex;flex-direction:column;gap:5px;flex:1;overflow-y:auto}
+.nav-item{
+  display:flex;align-items:center;gap:13px;padding:11px 12px;border-radius:13px;cursor:pointer;
+  transition:all .22s;border:1px solid transparent;position:relative;color:var(--muted);
+}
+.nav-item::before{
+  content:'';position:absolute;right:-14px;top:8px;bottom:8px;width:3px;background:currentColor;
+  transform:scaleY(0);transition:transform .22s;border-radius:3px;
+}
+.nav-item:hover{background:rgba(255,255,255,.03);color:var(--text)}
+.nav-item.active{background:rgba(255,255,255,.045);border-color:var(--border);color:var(--text)}
+.nav-item.active::before{transform:scaleY(1)}
+.nav-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .22s}
+.nav-icon .ic{width:21px;height:21px;stroke-width:1.9}
+.nav-item.active .nav-icon{transform:scale(1.06)}
+.nav-text{font-size:13.5px;font-weight:600}
+.nav-item.active .nav-text{font-weight:800}
+.nav-badge{
+  margin-right:auto;font-size:10.5px;font-weight:700;min-width:22px;height:22px;padding:0 7px;
+  display:inline-flex;align-items:center;justify-content:center;border-radius:8px;
+  background:rgba(255,255,255,.05);border:1px solid var(--border-2);
+}
+.nav-badge:empty{display:none}
+.nav-item[data-section="dashboard"]{color:var(--gold)}
+.nav-item[data-section="weekly"]{color:var(--blue)}
+.nav-item[data-section="homework"]{color:var(--green)}
+.nav-item[data-section="exams"]{color:var(--red)}
+.nav-item[data-section="halfhour"]{color:var(--purple)}
+.nav-item[data-section="courses"]{color:var(--orange)}
+.nav-item.active[data-section="dashboard"]{color:var(--gold-2)}
+.nav-item.active[data-section="weekly"]{color:#7cb3ef}
+.nav-item.active[data-section="homework"]{color:#6fdba4}
+.nav-item.active[data-section="exams"]{color:#ef7d70}
+.nav-item.active[data-section="halfhour"]{color:#c39bd3}
+.nav-item.active[data-section="courses"]{color:#f5b041}
+.nav-item[data-section="dashboard"] .nav-icon{background:rgba(212,175,55,.12)}
+.nav-item[data-section="weekly"] .nav-icon{background:rgba(74,144,226,.12)}
+.nav-item[data-section="homework"] .nav-icon{background:rgba(46,204,113,.12)}
+.nav-item[data-section="exams"] .nav-icon{background:rgba(231,76,60,.12)}
+.nav-item[data-section="halfhour"] .nav-icon{background:rgba(155,89,182,.14)}
+.nav-item[data-section="courses"] .nav-icon{background:rgba(243,156,18,.12)}
+.sidebar-footer{margin-top:14px;padding:14px 10px 4px;border-top:1px solid var(--border);display:flex;align-items:center;gap:11px}
+.avatar{
+  width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--gold-2),var(--gold-3));
+  display:flex;align-items:center;justify-content:center;color:#1c1503;font-weight:800;font-size:15px;flex-shrink:0;
+}
+.user-info h4{font-size:13px;font-weight:700}
+.user-info p{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ================= محتوا ================= */
+.main{flex:1;padding:30px 38px;overflow-y:auto;height:100vh;width:100%;max-width:1280px;margin:0 auto}
+.main-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:22px;border-bottom:1px solid var(--border);gap:16px;flex-wrap:wrap}
+.page-title{display:flex;align-items:center;gap:15px}
+.page-title-icon{width:52px;height:52px;border-radius:15px;display:flex;align-items:center;justify-content:center}
+.page-title-icon .ic{width:26px;height:26px;stroke-width:1.9}
+.page-title h2{font-size:22px;font-weight:800}
+.page-title p{font-size:12.5px;color:var(--muted);margin-top:4px}
+.header-actions{display:flex;gap:10px;align-items:center}
+.header-btn{
+  width:42px;height:42px;border-radius:12px;background:var(--card);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:.2s;
+}
+.header-btn:hover{color:var(--gold-2);border-color:var(--gold-3)}
+.header-btn .ic{width:19px;height:19px}
+.date-badge{
+  padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;
+  font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:8px;
+}
+.date-badge .ic{width:15px;height:15px;color:var(--gold)}
+
+.content-section{display:none;--accent:var(--gold);--accent-soft:rgba(212,175,55,.12)}
+.content-section.active{display:block;animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.content-section[data-section="weekly"]{--accent:#4a90e2;--accent-soft:rgba(74,144,226,.13)}
+.content-section[data-section="homework"]{--accent:#2ecc71;--accent-soft:rgba(46,204,113,.13)}
+.content-section[data-section="exams"]{--accent:#e74c3c;--accent-soft:rgba(231,76,60,.13)}
+.content-section[data-section="halfhour"]{--accent:#9b59b6;--accent-soft:rgba(155,89,182,.16)}
+.content-section[data-section="courses"]{--accent:#f39c12;--accent-soft:rgba(243,156,18,.13)}
+.content-section[data-section="dashboard"] .page-title-icon{background:rgba(212,175,55,.12);color:var(--gold)}
+.content-section[data-section="weekly"] .page-title-icon{background:rgba(74,144,226,.12);color:var(--blue)}
+.content-section[data-section="homework"] .page-title-icon{background:rgba(46,204,113,.12);color:var(--green)}
+.content-section[data-section="exams"] .page-title-icon{background:rgba(231,76,60,.12);color:var(--red)}
+.content-section[data-section="halfhour"] .page-title-icon{background:rgba(155,89,182,.14);color:var(--purple)}
+.content-section[data-section="courses"] .page-title-icon{background:rgba(243,156,18,.12);color:var(--orange)}
+
+/* ================= کامپوننت‌ها ================= */
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px}
+
+/* حالت خالی بزرگ */
+.empty{text-align:center;padding:64px 30px}
+.empty-ic{
+  width:96px;height:96px;margin:0 auto 22px;border-radius:28px;background:var(--accent-soft);
+  color:var(--accent);display:flex;align-items:center;justify-content:center;
+}
+.empty-ic .ic{width:42px;height:42px;stroke-width:1.6}
+.empty h3{font-size:19px;font-weight:800;margin-bottom:9px}
+.empty p{font-size:13px;color:var(--muted);max-width:430px;margin:0 auto 26px;line-height:2.1}
+
+/* حالت خالی کوچک */
+.empty-mini{
+  text-align:center;padding:46px 20px;border:1px dashed var(--border-2);border-radius:16px;
+  color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.empty-mini .ic{width:30px;height:30px;color:var(--muted-2);stroke-width:1.5;margin-bottom:6px}
+.empty-mini p{font-size:12.5px;line-height:1.9}
+
+/* دکمه‌ها */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;padding:11px 17px;border-radius:12px;
+  font-size:13px;font-weight:700;cursor:pointer;border:1px solid transparent;transition:.18s;font-family:inherit;
+}
+.btn .ic{width:16px;height:16px}
+.btn.primary{background:linear-gradient(135deg,#f0d47c,#c9a227);color:#221a02;box-shadow:0 4px 16px rgba(212,175,55,.22)}
+.btn.primary:hover{transform:translateY(-1px);box-shadow:0 7px 22px rgba(212,175,55,.32)}
+.btn.ghost{background:var(--card-2);color:var(--text);border-color:var(--border-2)}
+.btn.ghost:hover{border-color:var(--gold-3);color:var(--gold-2)}
+.btn.danger-ghost{background:rgba(231,76,60,.08);color:#ef7d70;border-color:rgba(231,76,60,.3)}
+.btn.danger-ghost:hover{background:rgba(231,76,60,.16)}
+.btn.sm{padding:8px 13px;font-size:12.5px;border-radius:10px}
+.icon-btn{
+  width:35px;height:35px;border-radius:10px;border:1px solid var(--border);background:var(--card-2);
+  color:var(--muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:.18s;flex-shrink:0;
+}
+.icon-btn .ic{width:15px;height:15px}
+.icon-btn:hover{color:#ef7d70;border-color:rgba(231,76,60,.45);background:rgba(231,76,60,.09)}
+.mr-auto{margin-right:auto}
+
+/* نوار عنوان بخش */
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.tb-right{display:flex;align-items:center;gap:14px}
+.tb-icon{
+  width:50px;height:50px;border-radius:15px;background:var(--accent-soft);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.tb-icon .ic{width:24px;height:24px;stroke-width:1.8}
+.tb-title h3{font-size:16.5px;font-weight:800}
+.tb-title p{font-size:12px;color:var(--muted);margin-top:4px}
+.tb-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+/* آمار */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.stat{display:flex;align-items:center;gap:13px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:15px}
+.stat-ic{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-ic .ic{width:20px;height:20px}
+.stat-value{font-size:19px;font-weight:800;line-height:1}
+.stat-label{font-size:11px;color:var(--muted);margin-top:5px}
+
+/* ردیف‌های لیست */
+.rows{display:flex;flex-direction:column;gap:11px}
+.row-item{
+  display:flex;gap:14px;padding:18px;background:var(--card);border:1px solid var(--border);
+  border-radius:16px;transition:.2s;align-items:flex-start;
+}
+.row-item:hover{border-color:var(--border-2);box-shadow:0 8px 22px rgba(0,0,0,.22);transform:translateY(-1px)}
+.row-item.done{opacity:.55}
+.row-item.done .row-title{text-decoration:line-through}
+.row-item.late{border-color:rgba(231,76,60,.4);background:linear-gradient(rgba(231,76,60,.03),rgba(231,76,60,.03)),var(--card)}
+.row-body{flex:1;min-width:0}
+.row-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.row-title{font-size:14.5px;font-weight:800}
+.row-desc{font-size:12.5px;color:var(--muted);line-height:2;margin-top:7px}
+.row-actions{display:flex;gap:10px;margin-top:14px;align-items:center}
+
+/* چک‌باکس سفارشی */
+.check{display:inline-flex;cursor:pointer;margin-top:2px}
+.check input{display:none}
+.check .mark{
+  width:23px;height:23px;border-radius:8px;border:2px solid var(--border-2);display:flex;
+  align-items:center;justify-content:center;color:transparent;transition:.18s;background:var(--input);
+}
+.check .mark .ic{width:13px;height:13px;stroke-width:3.2}
+.check input:checked + .mark{background:var(--green);border-color:var(--green);color:#06301a;box-shadow:0 2px 12px rgba(46,204,113,.35)}
+.check:hover .mark{border-color:var(--muted-2)}
+
+/* چیپ‌ها */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:9px;font-size:11.5px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-weight:600;
+}
+.chip .ic{width:13px;height:13px}
+.chip.warn{color:#f0a941;background:rgba(243,156,18,.08);border-color:rgba(243,156,18,.28)}
+.chip.danger{color:#ef7d70;background:rgba(231,76,60,.08);border-color:rgba(231,76,60,.32)}
+.chip.ok{color:#6fdba4;background:rgba(46,204,113,.08);border-color:rgba(46,204,113,.28)}
+
+/* سلکت */
+.select{position:relative;display:inline-flex}
+.select.full{width:100%}
+.select select{
+  appearance:none;padding:11px 14px;padding-left:38px;background:var(--card-2);border:1px solid var(--border-2);
+  border-radius:12px;color:var(--text);font-family:inherit;font-size:13px;cursor:pointer;min-width:160px;transition:.18s;
+}
+.select.full select{width:100%}
+.select select:hover,.select select:focus{outline:none;border-color:var(--gold-3)}
+.select .ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted);pointer-events:none}
+select option{background:var(--card);color:var(--text)}
+
+/* تب‌ها */
+.tabs{display:inline-flex;gap:4px;padding:5px;background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:18px}
+.tab{
+  display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border:0;background:transparent;
+  color:var(--muted);border-radius:10px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;transition:.2s;
+}
+.tab .ic{width:16px;height:16px}
+.tab:hover{color:var(--text)}
+.tab.active{background:var(--accent-soft);color:var(--accent)}
+
+/* ================= برنامه هفتگی ================= */
+.week-card{overflow:hidden}
+.week-scroll{overflow-x:auto}
+.week-grid{display:grid;grid-template-columns:66px repeat(7,minmax(120px,1fr));min-width:940px}
+.wg-cell{
+  border-bottom:1px solid var(--border);border-left:1px solid var(--border);padding:9px;
+  min-height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;
+}
+.wg-cell:nth-child(8n){border-left:none}
+.wg-cell:nth-last-child(-n+8){border-bottom:none}
+.wg-corner{background:rgba(0,0,0,.2);color:var(--muted-2)}
+.wg-corner .ic{width:18px;height:18px}
+.wg-head{background:rgba(255,255,255,.025);gap:4px}
+.wg-head b{font-size:13px;color:var(--gold-2);font-weight:800}
+.wg-head span{font-size:10.5px;color:var(--muted-2)}
+.wg-time{background:rgba(0,0,0,.16);font-size:11px;color:var(--muted);font-weight:700}
+.wg-slot{cursor:pointer;transition:background .15s}
+.wg-slot:hover{background:rgba(255,255,255,.025)}
+.wg-plus{color:var(--muted-2);opacity:0;transition:.15s;width:16px;height:16px}
+.wg-slot:hover .wg-plus{opacity:.55}
+.cls-box{
+  width:100%;border-radius:11px;border-right:3px solid;padding:9px 6px;display:flex;
+  flex-direction:column;gap:3px;transition:transform .15s;
+}
+.wg-slot:hover .cls-box{transform:scale(1.03)}
+.cls-box b{font-size:12px;font-weight:800}
+.cls-box small{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px;justify-content:center}
+
+/* ================= امتحانات ================= */
+.date-tile{
+  width:66px;border-radius:14px;background:var(--accent-soft);color:var(--accent);display:flex;
+  flex-direction:column;align-items:center;justify-content:center;gap:3px;flex-shrink:0;padding:12px 0;
+}
+.date-tile b{font-size:22px;font-weight:800;line-height:1}
+.date-tile span{font-size:10.5px;font-weight:600}
+.countdown{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:11.5px;font-weight:700}
+.countdown .ic{width:12px;height:12px}
+.cd-ok{color:#6fdba4;background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.28)}
+.cd-urgent{color:#f5b041;background:rgba(243,156,18,.1);border:1px solid rgba(243,156,18,.32)}
+.cd-past{color:#ef7d70;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.3)}
+.info-line{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--muted);margin-top:9px;line-height:2}
+.info-line .ic{width:15px;height:15px;margin-top:5px}
+.info-line b{color:var(--text)}
+.info-line.topics .ic{color:var(--accent)}
+.info-line.note .ic{color:var(--gold)}
+
+/* ================= نیم‌ساعته ================= */
+.book-cover{
+  width:58px;height:74px;border-radius:11px;background:var(--accent-soft);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.book-cover .ic{width:26px;height:26px;stroke-width:1.7}
+.book-row.finished{border-color:rgba(46,204,113,.35)}
+.badge-done{
+  display:inline-flex;align-items:center;gap:6px;color:#6fdba4;background:rgba(46,204,113,.1);
+  border:1px solid rgba(46,204,113,.28);padding:4px 12px;border-radius:999px;font-size:11.5px;font-weight:700;
+}
+.badge-done .ic{width:13px;height:13px}
+.badge-read{
+  display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;font-size:11.5px;font-weight:700;
+  color:var(--accent);background:var(--accent-soft);
+}
+.progress-wrap{margin-top:13px}
+.progress{height:9px;border-radius:6px;background:rgba(255,255,255,.06);overflow:hidden}
+.progress > i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#7d5ba6,#c39bd3);transition:width .5s ease}
+.progress-txt{font-size:11.5px;color:var(--muted);margin-top:8px}
+
+/* ================= مودال ================= */
+.modal-backdrop{position:fixed;inset:0;background:rgba(4,4,9,.75);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:.25s;z-index:100}
+.modal-backdrop.open{opacity:1;pointer-events:auto}
+.modal-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;z-index:101;pointer-events:none}
+.modal{
+  width:100%;max-width:480px;max-height:88vh;overflow-y:auto;background:var(--card);
+  border:1px solid var(--border-2);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.55);
+  transform:translateY(16px) scale(.97);opacity:0;transition:.28s cubic-bezier(.2,.9,.3,1.2);pointer-events:auto;
+}
+.modal-wrap.open .modal{transform:none;opacity:1}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:17px 22px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card);z-index:2}
+.modal-title{display:flex;align-items:center;gap:11px;font-size:15px;font-weight:800}
+.m-ic{width:36px;height:36px;border-radius:11px;background:rgba(212,175,55,.13);color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.m-ic .ic{width:18px;height:18px}
+.modal-body{padding:22px}
+.modal-foot{display:flex;gap:10px;padding:16px 22px;border-top:1px solid var(--border);flex-wrap:wrap}
+
+/* فرم‌ها */
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.field > label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:8px;font-weight:700}
+.inp{
+  width:100%;padding:11px 14px;background:var(--input);border:1px solid var(--border);border-radius:11px;
+  color:var(--text);font-family:inherit;font-size:13px;transition:.18s;
+}
+.inp:focus{outline:none;border-color:var(--gold-3);box-shadow:0 0 0 3px rgba(212,175,55,.1)}
+textarea.inp{resize:vertical;min-height:84px;line-height:2}
+.hint{font-size:11px;color:var(--muted-2);margin-top:7px;line-height:1.8}
+.j-date{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.j-cell span{display:block;font-size:10.5px;color:var(--muted-2);margin-bottom:6px;text-align:center;font-weight:600}
+
+/* مدیریت دروس */
+.sub-list{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;max-height:225px;overflow-y:auto;padding-left:4px}
+.sub-item{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--input);border:1px solid var(--border);border-radius:12px}
+.sub-dot{width:14px;height:14px;border-radius:6px;flex-shrink:0}
+.sub-name{flex:1;font-size:13.5px;font-weight:700}
+.sub-count{font-size:11px;color:var(--muted-2)}
+.divider{height:1px;background:var(--border);margin:20px 0}
+.sub-form-title{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:800;color:var(--gold-2);margin-bottom:16px}
+.sub-form-title .ic{width:16px;height:16px}
+.color-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+input[type=color]{width:48px;height:42px;border:1px solid var(--border-2);border-radius:11px;background:var(--input);padding:5px;cursor:pointer}
+.swatches{display:flex;gap:7px;flex-wrap:wrap}
+.swatch{width:28px;height:28px;border-radius:9px;border:2px solid transparent;cursor:pointer;transition:.15s;padding:0}
+.swatch:hover{transform:scale(1.12)}
+
+/* ثبت مطالعه */
+.read-now{background:var(--input);border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:18px}
+.read-now p{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.9}
+.quick-adds{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.q-add{
+  padding:7px 13px;border-radius:10px;background:var(--input);border:1px solid var(--border);
+  color:var(--muted);font-size:12px;font-family:inherit;cursor:pointer;transition:.15s;font-weight:600;
+}
+.q-add:hover{color:var(--gold-2);border-color:var(--gold-3)}
+
+/* ================= ریسپانسیو ================= */
+@media (max-width:1100px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:768px){
+  .sidebar{width:78px;padding:16px 8px}
+  .logo-text,.nav-text,.user-info,.nav-title,.nav-badge{display:none}
+  .nav-item{justify-content:center;padding:11px 0}
+  .main{padding:18px 14px}
+  .stats{grid-template-columns:1fr 1fr;gap:8px}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .tb-actions{justify-content:flex-start}
+  .modal{max-width:100%}
+}
+</style>
 </head>
 <body>
-  <div class="app-container">
-    <div class="content">
-      <!-- فعلاً صفحه خالی است -->
+
+<!-- ================= سایدبار ================= -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1c1503" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <h1>پنل آموزشی</h1>
+      <p>سامانه دانش‌آموز</p>
     </div>
   </div>
-  <script src="renderer.js"></script>
+
+  <div class="nav-title">منوی اصلی</div>
+  <nav class="nav">
+    <div class="nav-item active" data-section="dashboard">
+      <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></div>
+      <span class="nav-text">داشبورد</span>
+    </div>
+    <div class="nav-item" data-section="weekly">
+      <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <span class="nav-text">برنامه هفتگی</span>
+    </div>
+    <div class="nav-item" data-section="homework">
+      <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></div>
+      <span class="nav-text">تکالیف</span>
+      <span class="nav-badge" id="badge-homework"></span>
+    </div>
+    <div class="nav-item" data-section="exams">
+      <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <span class="nav-text">امتحانات</span>
+      <span class="nav-badge" id="badge-exams"></span>
+    </div>
+    <div class="nav-item" data-section="halfhour">
+      <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+      <span class="nav-text">نیم‌ساعته</span>
+      <span class="nav-badge" id="badge-halfhour"></span>
+    </div>
+    <div class="nav-item" data-section="courses">
+      <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+      <span class="nav-text">برنامه‌های درسی</span>
+      <span class="nav-badge" id="badge-courses"></span>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="avatar">ع</div>
+    <div class="user-info">
+      <h4>علی رضایی</h4>
+      <p>پایه دهم</p>
+    </div>
+  </div>
+</aside>
+
+<!-- ================= محتوا ================= -->
+<main class="main">
+  <div class="main-header">
+    <div class="page-title">
+      <div class="page-title-icon" id="pageTitleIcon">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      </div>
+      <div>
+        <h2 id="pageTitle">داشبورد</h2>
+        <p id="pageSubtitle">خلاصه‌ای از وضعیت شما</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="date-badge">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span id="todayText"></span>
+      </div>
+      <button class="header-btn" title="اعلان‌ها">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </button>
+      <button class="header-btn" title="تنظیمات">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- داشبورد (دست‌نخورده) -->
+  <section class="content-section active" data-section="dashboard">
+    <div class="card empty">
+      <div class="empty-ic">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      </div>
+      <h3>به داشبورد خوش آمدید</h3>
+      <p>این بخش در حال حاضر خالی است. به زودی اطلاعات کاملی از وضعیت درسی، نمرات و فعالیت‌های شما در اینجا نمایش داده خواهد شد.</p>
+    </div>
+  </section>
+
+  <section class="content-section" data-section="weekly"><div id="weeklyContent"></div></section>
+  <section class="content-section" data-section="homework"><div id="homeworkContent"></div></section>
+  <section class="content-section" data-section="exams"><div id="examsContent"></div></section>
+  <section class="content-section" data-section="halfhour"><div id="halfhourContent"></div></section>
+  <section class="content-section" data-section="courses"><div id="coursesContent"></div></section>
+</main>
+
+<!-- مودال -->
+<div class="modal-backdrop" id="backdrop"></div>
+<div class="modal-wrap" id="modalWrap"></div>
+
+<script>
+/* ================= کتابخانه آیکون (فقط SVG) ================= */
+const ICONS = {
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>',
+  checkSquare:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+  openBook:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>',
+  bell:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  alert:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  bulb:'<line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/>',
+  layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+  pencil:'<path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
+  check:'<polyline points="20 6 9 17 4 12"/>',
+  chevDown:'<polyline points="6 9 12 15 18 9"/>',
+  checkCircle:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  list:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+  pin:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  timer:'<line x1="10" y1="2" x2="14" y2="2"/><line x1="12" y1="14" x2="15" y2="11"/><circle cx="12" cy="14" r="8"/>'
+};
+const ic = (name, cls='') => `<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
+
+/* ================= تاریخ شمسی ================= */
+function gregorianToJalali(gy, gm, gd){
+  var g_d_m=[0,31,59,90,120,151,181,212,243,273,304,334];
+  var jy=(gy<=1600)?0:979; gy-=(gy<=1600)?621:1600;
+  var gy2=(gm>2)?(gy+1):gy;
+  var days=(365*gy)+(parseInt((gy2+3)/4))-(parseInt((gy2+99)/100))+(parseInt((gy2+399)/400))-80+gd+g_d_m[gm-1];
+  jy+=33*(parseInt(days/12053)); days%=12053;
+  jy+=4*(parseInt(days/1461)); days%=1461;
+  jy+=parseInt((days-1)/365);
+  if(days>365) days=(days-1)%365;
+  var jm=(days<186)?1+parseInt(days/31):7+parseInt((days-186)/30);
+  var jd=1+((days<186)?(days%31):((days-186)%30));
+  return [jy,jm,jd];
+}
+function jalaliToGregorian(jy, jm, jd){
+  jy=parseInt(jy); jm=parseInt(jm); jd=parseInt(jd); jy+=1595;
+  var days=-355668+(365*jy)+((parseInt(jy/33))*8)+parseInt(((jy%33)+3)/4)+jd+((jm<7)?((jm-1)*31):(((jm-7)*30)+186));
+  var gy=400*(parseInt(days/146097)); days%=146097;
+  if(days>36524){ gy+=100*(parseInt(--days/36524)); days%=36524; if(days>=365) days++; }
+  gy+=4*(parseInt(days/1461)); days%=1461;
+  if(days>365){ gy+=parseInt((days-1)/365); days=(days-1)%365; }
+  var gd=days+1;
+  var sal_a=[0,31,((gy%4===0&&gy%100!==0)||(gy%400===0))?29:28,31,30,31,30,31,31,30,31,30,31];
+  var gm; for(gm=0; gm<13 && gd>sal_a[gm]; gm++) gd-=sal_a[gm];
+  return [gy,gm,gd];
+}
+const persianMonths=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+const persianDays=['شنبه','یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه'];
+const toPersianNumber = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const formatJalali = date => { const [y,m,d]=gregorianToJalali(date.getFullYear(),date.getMonth()+1,date.getDate()); return `${toPersianNumber(y)}/${toPersianNumber(String(m).padStart(2,'0'))}/${toPersianNumber(String(d).padStart(2,'0'))}`; };
+function getWeekDates(date){
+  const saturdayBased=(date.getDay()+1)%7;
+  const start=new Date(date); start.setDate(date.getDate()-saturdayBased); start.setHours(0,0,0,0);
+  const end=new Date(start); end.setDate(start.getDate()+6); end.setHours(23,59,59,999);
+  return {start,end};
+}
+const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2,5);
+const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+/* ================= وضعیت ================= */
+const state = {
+  weekly: { selectedWeek:null, classes:{} },
+  subjects: [],
+  homework: {},
+  exams: {},
+  halfHour: { books:[], exams:[] },
+  coursePlans: {},
+  ui: { homeworkSubject:null, examTab:'subjects', examSubject:null, coursesSubject:null }
+};
+
+/* ================= مودال ================= */
+const backdrop = document.getElementById('backdrop');
+const modalWrap = document.getElementById('modalWrap');
+function openModalHTML(html){ modalWrap.innerHTML = html; backdrop.classList.add('open'); modalWrap.classList.add('open'); }
+function closeModal(){ backdrop.classList.remove('open'); modalWrap.classList.remove('open'); modalWrap.innerHTML=''; }
+backdrop.addEventListener('click', closeModal);
+modalWrap.addEventListener('click', e => { if(e.target === modalWrap) closeModal(); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
+function modalShell(title, iconName, body, foot){
+  return `<div class="modal">
+    <div class="modal-head">
+      <div class="modal-title"><span class="m-ic">${ic(iconName)}</span>${title}</div>
+      <button class="icon-btn" onclick="closeModal()" title="بستن">${ic('x')}</button>
+    </div>
+    <div class="modal-body">${body}</div>
+    <div class="modal-foot">${foot}</div>
+  </div>`;
+}
+function field(label, input, hint){ return `<div class="field"><label>${label}</label>${input}${hint?`<p class="hint">${hint}</p>`:''}</div>`; }
+function jaliInput(prefix, y='', m='', d=''){
+  return `<div class="j-date">
+    <div class="j-cell"><span>سال</span><input class="inp" type="number" id="${prefix}Y" value="${y}"></div>
+    <div class="j-cell"><span>ماه</span><input class="inp" type="number" id="${prefix}M" value="${m}" min="1" max="12"></div>
+    <div class="j-cell"><span>روز</span><input class="inp" type="number" id="${prefix}D" value="${d}" min="1" max="31"></div>
+  </div>`;
+}
+function readJali(prefix){
+  const y=parseInt(document.getElementById(prefix+'Y').value);
+  const m=parseInt(document.getElementById(prefix+'M').value);
+  const d=parseInt(document.getElementById(prefix+'D').value);
+  if(!y||!m||!d||m<1||m>12||d<1||d>31) return null;
+  return {y,m,d};
+}
+function jaliToDate(j){ const [gy,gm,gd]=jalaliToGregorian(j.y,j.m,j.d); return new Date(gy,gm-1,gd); }
+function selectInput(id, options, selected){
+  return `<div class="select full"><select id="${id}">${options.map(o=>`<option value="${o.v}" ${o.v===selected?'selected':''}>${esc(o.t)}</option>`).join('')}</select>${ic('chevDown')}</div>`;
+}
+function countdown(iso){
+  const diff = new Date(iso) - new Date();
+  if(diff<=0) return {text:'برگزار شده', past:true, urgent:false};
+  const d=Math.floor(diff/864e5), h=Math.floor(diff%864e5/36e5);
+  if(d>=2) return {text:`${toPersianNumber(d)} روز دیگر`, past:false, urgent:false};
+  if(d===1) return {text:'فردا', past:false, urgent:true};
+  if(h>=1) return {text:`${toPersianNumber(h)} ساعت دیگر`, past:false, urgent:true};
+  return {text:'کمتر از یک ساعت', past:false, urgent:true};
+}
+
+/* ================= ناوبری ================= */
+const titles = {
+  dashboard:{title:'داشبورد', sub:'خلاصه‌ای از وضعیت شما'},
+  weekly:{title:'برنامه هفتگی', sub:'جدول کلاس‌های شنبه تا جمعه'},
+  homework:{title:'تکالیف', sub:'مدیریت تکالیف درسی و مهلت تحویل'},
+  exams:{title:'امتحانات', sub:'برنامه امتحانات و زمان باقی‌مانده'},
+  halfhour:{title:'نیم‌ساعته', sub:'ثبت و پیگیری مطالعه آزاد'},
+  courses:{title:'برنامه‌های درسی', sub:'برنامه‌ریزی مطالعاتی هر درس'}
+};
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const section = item.dataset.section;
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    item.classList.add('active');
+    document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));
+    document.querySelector(`.content-section[data-section="${section}"]`).classList.add('active');
+    document.getElementById('pageTitle').textContent = titles[section].title;
+    document.getElementById('pageSubtitle').textContent = titles[section].sub;
+    const clone = item.querySelector('.nav-icon svg').cloneNode(true);
+    const holder = document.getElementById('pageTitleIcon');
+    holder.innerHTML=''; holder.appendChild(clone);
+    renderSection(section);
+  });
+});
+function renderSection(s){
+  if(s==='weekly') renderWeekly();
+  else if(s==='homework') renderHomework();
+  else if(s==='exams') renderExams();
+  else if(s==='halfhour') renderHalfHour();
+  else if(s==='courses') renderCourses();
+}
+function renderAll(){ renderWeekly(); renderHomework(); renderExams(); renderHalfHour(); renderCourses(); updateNavBadges(); }
+function updateNavBadges(){
+  const set=(id,val)=>{ const el=document.getElementById('badge-'+id); if(el) el.textContent = val>0 ? toPersianNumber(val) : ''; };
+  set('homework', Object.values(state.homework).flat().filter(h=>!h.done).length);
+  set('exams', [...Object.values(state.exams).flat(), ...state.halfHour.exams].filter(e=>new Date(e.date)>new Date()).length);
+  set('halfhour', state.halfHour.books.filter(b=>b.readPages<b.totalPages).length);
+  set('courses', Object.values(state.coursePlans).flat().filter(p=>!p.done).length);
+}
+const today = new Date();
+const [ty,tm,td] = gregorianToJalali(today.getFullYear(), today.getMonth()+1, today.getDate());
+document.getElementById('todayText').textContent = `${persianDays[(today.getDay()+1)%7]}، ${toPersianNumber(td)} ${persianMonths[tm-1]} ${toPersianNumber(ty)}`;
+
+/* ================= برنامه هفتگی ================= */
+function renderWeekly(){
+  const el = document.getElementById('weeklyContent');
+  if(!state.weekly.selectedWeek){
+    el.innerHTML = `<div class="card empty">
+      <div class="empty-ic">${ic('calendar')}</div>
+      <h3>برنامه هفتگی</h3>
+      <p>برای شروع، هفته مورد نظر را مشخص کنید تا جدول کلاس‌ها از شنبه تا جمعه ساخته شود. سپس می‌توانید روی هر خانه کلیک کرده و کلاس اضافه کنید.</p>
+      <button class="btn primary" onclick="openWeekSelector()">${ic('plus')} تعیین برنامه هفتگی</button>
+    </div>`;
+    return;
+  }
+  const {start,end} = state.weekly.selectedWeek;
+  const [sy,sm,sd]=gregorianToJalali(start.getFullYear(),start.getMonth()+1,start.getDate());
+  const [ey,em,ed]=gregorianToJalali(end.getFullYear(),end.getMonth()+1,end.getDate());
+  let dayHeads='';
+  for(let i=0;i<7;i++){
+    const d=new Date(start); d.setDate(start.getDate()+i);
+    const [,jm,jd]=gregorianToJalali(d.getFullYear(),d.getMonth()+1,d.getDate());
+    dayHeads += `<div class="wg-cell wg-head"><b>${persianDays[i]}</b><span>${toPersianNumber(jd)} ${persianMonths[jm-1]}</span></div>`;
+  }
+  let rows='';
+  for(let h=8;h<=15;h++){
+    rows += `<div class="wg-cell wg-time">${toPersianNumber(String(h).padStart(2,'0'))}:۰۰</div>`;
+    for(let day=0;day<7;day++){
+      const key=`${day}-${h}`;
+      const cls=state.weekly.classes[key];
+      const subj=cls?state.subjects.find(s=>s.id===cls.subject):null;
+      if(cls && subj){
+        rows += `<div class="wg-cell wg-slot" onclick="openClassModal(${day},${h})">
+          <div class="cls-box" style="background:${subj.color}1c;border-color:${subj.color}">
+            <b style="color:${subj.color}">${esc(subj.name)}</b>
+            ${cls.teacher?`<small>${ic('user','ic-xxs')} ${esc(cls.teacher)}</small>`:''}
+            ${cls.room?`<small>${ic('pin','ic-xxs')} ${esc(cls.room)}</small>`:''}
+          </div></div>`;
+      } else {
+        rows += `<div class="wg-cell wg-slot" onclick="openClassModal(${day},${h})">${ic('plus','wg-plus')}</div>`;
+      }
+    }
+  }
+  el.innerHTML = `
+    <div class="toolbar">
+      <div class="tb-right">
+        <div class="tb-icon">${ic('calendar')}</div>
+        <div class="tb-title">
+          <h3>هفته ${toPersianNumber(sd)} ${persianMonths[sm-1]} تا ${toPersianNumber(ed)} ${persianMonths[em-1]} ${toPersianNumber(ey)}</h3>
+          <p>برای افزودن یا ویرایش کلاس، روی هر خانه کلیک کنید</p>
+        </div>
+      </div>
+      <div class="tb-actions">
+        <button class="btn ghost" onclick="openWeekSelector()">${ic('pencil')} تغییر هفته</button>
+      </div>
+    </div>
+    <div class="card week-card"><div class="week-scroll"><div class="week-grid">
+      <div class="wg-cell wg-corner">${ic('clock')}</div>
+      ${dayHeads}${rows}
+    </div></div></div>`;
+}
+function openWeekSelector(){
+  const sat=new Date(); sat.setDate(sat.getDate()-((sat.getDay()+1)%7));
+  const [sy,sm,sd]=gregorianToJalali(sat.getFullYear(),sat.getMonth()+1,sat.getDate());
+  const body = field('تاریخ شروع هفته (روز شنبه)', jaliInput('wk',sy,sm,sd), 'تاریخ واردشده باید یک روز شنبه باشد؛ برنامه از شنبه تا جمعه ساخته می‌شود.');
+  const foot = `<button class="btn primary" onclick="selectWeek()">${ic('check')} تایید هفته</button>
+                <button class="btn ghost" onclick="closeModal()">انصراف</button>`;
+  openModalHTML(modalShell('تعیین برنامه هفتگی','calendar',body,foot));
+}
+function selectWeek(){
+  const j=readJali('wk');
+  if(!j){ alert('لطفاً تاریخ کامل و معتبر وارد کنید.'); return; }
+  const date=jaliToDate(j);
+  if(date.getDay()!==6){ alert('روز انتخاب‌شده شنبه نیست؛ لطفاً یک روز شنبه وارد کنید.'); return; }
+  state.weekly.selectedWeek=getWeekDates(date);
+  closeModal(); renderWeekly();
+}
+function openClassModal(day,hour){
+  if(state.subjects.length===0){ alert('برای ثبت کلاس، ابتدا دروس را از بخش تکالیف ایجاد کنید.'); return; }
+  const key=`${day}-${hour}`;
+  const cur=state.weekly.classes[key];
+  const body = `
+    ${field('درس', selectInput('clsSubject', state.subjects.map(s=>({v:s.id,t:s.name})), cur?cur.subject:''))}
+    ${field('نام معلم', `<input class="inp" type="text" id="clsTeacher" value="${cur?esc(cur.teacher||''):''}" placeholder="اختیاری">`)}
+    ${field('محل برگزاری', `<input class="inp" type="text" id="clsRoom" value="${cur?esc(cur.room||''):''}" placeholder="اختیاری">`)}`;
+  const foot = `<button class="btn primary" onclick="saveClass('${key}')">${ic('check')} ذخیره کلاس</button>
+                <button class="btn ghost" onclick="closeModal()">انصراف</button>
+                ${cur?`<button class="btn danger-ghost mr-auto" onclick="deleteClass('${key}')">${ic('trash')} حذف</button>`:''}`;
+  openModalHTML(modalShell(`کلاس ${persianDays[day]} — ساعت ${toPersianNumber(String(hour).padStart(2,'0'))}:۰۰`,'clock',body,foot));
+}
+function saveClass(key){
+  const subject=document.getElementById('clsSubject').value;
+  if(!subject){ alert('لطفاً درس را انتخاب کنید.'); return; }
+  state.weekly.classes[key]={
+    subject,
+    teacher:document.getElementById('clsTeacher').value.trim(),
+    room:document.getElementById('clsRoom').value.trim()
+  };
+  closeModal(); renderWeekly();
+}
+function deleteClass(key){ delete state.weekly.classes[key]; closeModal(); renderWeekly(); }
+
+/* ================= مدیریت دروس (زیرساخت مشترک) ================= */
+function openSubjectsModal(){
+  const list = state.subjects.length
+    ? state.subjects.map(s=>`
+      <div class="sub-item">
+        <span class="sub-dot" style="background:${s.color}"></span>
+        <span class="sub-name">${esc(s.name)}</span>
+        <span class="sub-count">${toPersianNumber((state.homework[s.id]||[]).length)} تکلیف</span>
+        <button class="icon-btn" onclick="deleteSubject('${s.id}')" title="حذف">${ic('trash')}</button>
+      </div>`).join('')
+    : `<div class="empty-mini">${ic('layers')}<p>هنوز درسی تعریف نشده است</p></div>`;
+  const swatchColors=['#d4af37','#4a90e2','#2ecc71','#e74c3c','#9b59b6','#f39c12','#1abc9c','#e91e63','#00bcd4','#ff7043'];
+  const body = `
+    <div class="sub-list">${list}</div>
+    <div class="divider"></div>
+    <div class="sub-form-title">${ic('plus')} افزودن درس جدید</div>
+    ${field('نام درس', `<input class="inp" type="text" id="newSubjectName" placeholder="مثلاً ریاضی، فیزیک، ادبیات...">`)}
+    ${field('رنگ اختصاصی درس', `
+      <div class="color-row">
+        <input type="color" id="newSubjectColor" value="#d4af37">
+        <div class="swatches">${swatchColors.map(c=>`<button type="button" class="swatch" style="background:${c}" onclick="pickColor('${c}')"></button>`).join('')}</div>
+      </div>`)}`;
+  const foot = `<button class="btn primary" onclick="addSubject()">${ic('plus')} افزودن درس</button>
+                <button class="btn ghost" onclick="closeModal()">بستن</button>`;
+  openModalHTML(modalShell('مدیریت دروس','layers',body,foot));
+}
+function pickColor(c){ document.getElementById('newSubjectColor').value=c; }
+function addSubject(){
+  const name=document.getElementById('newSubjectName').value.trim();
+  const color=document.getElementById('newSubjectColor').value;
+  if(!name){ alert('لطفاً نام درس را وارد کنید.'); return; }
+  state.subjects.push({id:generateId(), name, color});
+  openSubjectsModal(); renderAll();
+}
+function deleteSubject(id){
+  if(!confirm('با حذف این درس، تمام تکالیف، امتحانات و برنامه‌های مرتبط نیز حذف می‌شوند. ادامه می‌دهید؟')) return;
+  state.subjects=state.subjects.filter(s=>s.id!==id);
+  delete state.homework[id]; delete state.exams[id]; delete state.coursePlans[id];
+  openSubjectsModal(); renderAll();
+}
+
+/* ================= تکالیف ================= */
+function hwStats(sid){
+  const list=state.homework[sid]||[];
+  const done=list.filter(h=>h.done).length;
+  const overdue=list.filter(h=>!h.done && new Date(h.dueDate)<new Date()).length;
+  return {total:list.length, done, pending:list.length-done, overdue};
+}
+function statBox(iconName,label,val,color,bg){
+  return `<div class="stat"><div class="stat-ic" style="color:${color};background:${bg}">${ic(iconName)}</div>
+    <div><div class="stat-value">${toPersianNumber(val)}</div><div class="stat-label">${label}</div></div></div>`;
+}
+function renderHomework(){
+  const el=document.getElementById('homeworkContent');
+  if(state.subjects.length===0){
+    el.innerHTML = `<div class="card empty">
+      <div class="empty-ic">${ic('layers')}</div>
+      <h3>زیرساخت دروس</h3>
+      <p>برای مدیریت تکالیف، ابتدا دروس خود را تعریف کنید. این دروس در بخش‌های امتحانات و برنامه‌های درسی نیز مورد استفاده قرار می‌گیرند.</p>
+      <button class="btn primary" onclick="openSubjectsModal()">${ic('plus')} ایجاد درس</button>
+    </div>`;
+    return;
+  }
+  if(!state.ui.homeworkSubject || !state.subjects.some(s=>s.id===state.ui.homeworkSubject)) state.ui.homeworkSubject=state.subjects[0].id;
+  const subject=state.subjects.find(s=>s.id===state.ui.homeworkSubject);
+  const list=state.homework[subject.id]||[];
+  const st=hwStats(subject.id);
+  let items='';
+  if(list.length===0){
+    items=`<div class="empty-mini">${ic('file')}<p>هیچ تکلیفی برای درس «${esc(subject.name)}» ثبت نشده است</p></div>`;
+  } else {
+    list.forEach(h=>{
+      const due=new Date(h.dueDate);
+      const overdue=!h.done && due<new Date();
+      items += `
+      <div class="row-item ${h.done?'done':''} ${overdue?'late':''}">
+        <label class="check">
+          <input type="checkbox" ${h.done?'checked':''} onchange="toggleHomework('${subject.id}','${h.id}')">
+          <span class="mark">${ic('check')}</span>
+        </label>
+        <div class="row-body">
+          <div class="row-top"><span class="row-title">${esc(h.title)}</span></div>
+          ${h.desc?`<p class="row-desc">${esc(h.desc)}</p>`:''}
+          <div class="chips">
+            <span class="chip ${overdue?'danger':''}">${ic('calendar')} مهلت: ${formatJalali(due)}</span>
+            ${h.reminder?`<span class="chip warn">${ic('bell')} یادآوری: ${formatJalali(new Date(h.reminder))}</span>`:''}
+            ${overdue?`<span class="chip danger">${ic('alert')} گذشته از مهلت</span>`:''}
+            ${h.done?`<span class="chip ok">${ic('checkCircle')} انجام شد</span>`:''}
+          </div>
+        </div>
+        <button class="icon-btn" title="حذف" onclick="deleteHomework('${subject.id}','${h.id}')">${ic('trash')}</button>
+      </div>`;
+    });
+  }
+  el.innerHTML = `
+    <div class="toolbar">
+      <div class="tb-right">
+        <div class="tb-icon">${ic('file')}</div>
+        <div class="tb-title"><h3>تکالیف — ${esc(subject.name)}</h3>
+        <p>${toPersianNumber(st.pending)} تکلیف باقی‌مانده از ${toPersianNumber(st.total)}</p></div>
+      </div>
+      <div class="tb-actions">
+        <div class="select">
+          <select onchange="changeHomeworkSubject(this.value)">
+            ${state.subjects.map(s=>`<option value="${s.id}" ${s.id===subject.id?'selected':''}>${esc(s.name)}</option>`).join('')}
+          </select>${ic('chevDown')}
+        </div>
+        <button class="btn ghost" onclick="openSubjectsModal()">${ic('layers')} مدیریت دروس</button>
+        <button class="btn primary" onclick="openHomeworkModal()">${ic('plus')} تکلیف جدید</button>
+      </div>
+    </div>
+    <div class="stats">
+      ${statBox('list','کل تکالیف',st.total,'var(--blue)','rgba(74,144,226,.12)')}
+      ${statBox('checkCircle','انجام‌شده',st.done,'var(--green)','rgba(46,204,113,.12)')}
+      ${statBox('clock','باقی‌مانده',st.pending,'var(--gold)','rgba(212,175,55,.12)')}
+      ${statBox('alert','گذشته از مهلت',st.overdue,'var(--red)','rgba(231,76,60,.12)')}
+    </div>
+    <div class="rows">${items}</div>`;
+}
+function changeHomeworkSubject(id){ state.ui.homeworkSubject=id; renderHomework(); }
+function openHomeworkModal(){
+  const subject=state.subjects.find(s=>s.id===state.ui.homeworkSubject);
+  const t=new Date(); const [jy,jm,jd]=gregorianToJalali(t.getFullYear(),t.getMonth()+1,t.getDate());
+  const body = `
+    ${field('عنوان تکلیف', `<input class="inp" type="text" id="hwTitle" placeholder="مثلاً حل تمرین‌های صفحه ۴۵">`)}
+    ${field('توضیحات', `<textarea class="inp" id="hwDesc" placeholder="جزئیات تکلیف (اختیاری)"></textarea>`)}
+    ${field('مهلت تحویل', jaliInput('hwDue',jy,jm,jd))}
+    ${field('یادآوری', jaliInput('hwRem','','',''), 'اختیاری — در این تاریخ به شما یادآوری می‌شود')}`;
+  const foot = `<button class="btn primary" onclick="saveHomework()">${ic('check')} ذخیره تکلیف</button>
+                <button class="btn ghost" onclick="closeModal()">انصراف</button>`;
+  openModalHTML(modalShell(`تکلیف جدید — ${esc(subject.name)}`,'file',body,foot));
+}
+function saveHomework(){
+  const title=document.getElementById('hwTitle').value.trim();
+  const desc=document.getElementById('hwDesc').value.trim();
+  const due=readJali('hwDue'), rem=readJali('hwRem');
+  if(!title){ alert('عنوان الزامی است.'); return; }
+  if(!due){ alert('تاریخ مهلت را کامل وارد کنید.'); return; }
+  const subjectId=state.ui.homeworkSubject;
+  if(!state.homework[subjectId]) state.homework[subjectId]=[];
+  state.homework[subjectId].push({
+    id:generateId(), title, desc,
+    dueDate:jaliToDate(due).toISOString(),
+    reminder:rem?jaliToDate(rem).toISOString():null,
+    done:false
+  });
+  closeModal(); renderHomework(); updateNavBadges();
+}
+function toggleHomework(sid,id){
+  const hw=state.homework[sid].find(h=>h.id===id);
+  if(hw) hw.done=!hw.done;
+  renderHomework(); updateNavBadges();
+}
+function deleteHomework(sid,id){
+  if(!confirm('این تکلیف حذف شود؟')) return;
+  state.homework[sid]=state.homework[sid].filter(h=>h.id!==id);
+  renderHomework(); updateNavBadges();
+}
+
+/* ================= امتحانات ================= */
+function renderExams(){
+  const el=document.getElementById('examsContent');
+  let html = `<div class="tabs">
+    <button class="tab ${state.ui.examTab==='subjects'?'active':''}" onclick="switchExamTab('subjects')">${ic('book')} امتحانات دروس</button>
+    <button class="tab ${state.ui.examTab==='halfhour'?'active':''}" onclick="switchExamTab('halfhour')">${ic('openBook')} امتحانات نیم‌ساعته</button>
+  </div>`;
+  if(state.ui.examTab==='subjects'){
+    if(state.subjects.length===0){
+      html += `<div class="card empty">
+        <div class="empty-ic">${ic('checkSquare')}</div>
+        <h3>امتحانات دروس</h3>
+        <p>برای ثبت امتحان، ابتدا باید دروس خود را تعریف کنید. دروس تعریف‌شده در بخش تکالیف، اینجا نیز قابل انتخاب هستند.</p>
+        <button class="btn primary" onclick="openSubjectsModal()">${ic('plus')} ایجاد درس</button>
+      </div>`;
+      el.innerHTML=html; return;
+    }
+    if(!state.ui.examSubject || !state.subjects.some(s=>s.id===state.ui.examSubject)) state.ui.examSubject=state.subjects[0].id;
+    const subject=state.subjects.find(s=>s.id===state.ui.examSubject);
+    const exams=state.exams[subject.id]||[];
+    const upcoming=exams.filter(e=>new Date(e.date)>new Date()).length;
+    html += `<div class="toolbar">
+      <div class="tb-right">
+        <div class="tb-icon">${ic('checkSquare')}</div>
+        <div class="tb-title"><h3>امتحانات — ${esc(subject.name)}</h3>
+        <p>${toPersianNumber(upcoming)} امتحان پیش رو</p></div>
+      </div>
+      <div class="tb-actions">
+        <div class="select">
+          <select onchange="changeExamSubject(this.value)">
+            ${state.subjects.map(s=>`<option value="${s.id}" ${s.id===subject.id?'selected':''}>${esc(s.name)}</option>`).join('')}
+          </select>${ic('chevDown')}
+        </div>
+        <button class="btn primary" onclick="openExamModal()">${ic('plus')} امتحان جدید</button>
+      </div>
+    </div>`;
+    if(exams.length===0){
+      html += `<div class="empty-mini">${ic('checkSquare')}<p>هیچ امتحانی برای «${esc(subject.name)}» ثبت نشده است</p></div>`;
+    } else {
+      html += `<div class="rows">`;
+      [...exams].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(e=>{ html += examCardHTML(e,null,subject.id); });
+      html += `</div>`;
+    }
+  } else {
+    html += `<div class="toolbar">
+      <div class="tb-right">
+        <div class="tb-icon">${ic('openBook')}</div>
+        <div class="tb-title"><h3>امتحانات نیم‌ساعته</h3>
+        <p>امتحانات مرتبط با کتاب‌های مطالعه آزاد</p></div>
+      </div>
+      <div class="tb-actions"><button class="btn primary" onclick="openHalfHourExamModal()">${ic('plus')} امتحان جدید</button></div>
+    </div>`;
+    if(state.halfHour.exams.length===0){
+      html += `<div class="empty-mini">${ic('openBook')}<p>هیچ امتحانی برای کتاب‌های نیم‌ساعته ثبت نشده است</p></div>`;
+    } else {
+      html += `<div class="rows">`;
+      [...state.halfHour.exams].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(e=>{
+        const book=state.halfHour.books.find(b=>b.id===e.bookId);
+        html += examCardHTML(e,book,null);
+      });
+      html += `</div>`;
+    }
+  }
+  el.innerHTML=html;
+}
+function examCardHTML(e, book, subjectId){
+  const d=new Date(e.date);
+  const [jy,jm,jd]=gregorianToJalali(d.getFullYear(),d.getMonth()+1,d.getDate());
+  const cd=countdown(e.date);
+  const delFn=subjectId?`deleteExam('${subjectId}','${e.id}')`:`deleteHalfHourExam('${e.id}')`;
+  return `
+  <div class="row-item">
+    <div class="date-tile"><b>${toPersianNumber(jd)}</b><span>${persianMonths[jm-1]}</span></div>
+    <div class="row-body">
+      <div class="row-top">
+        <span class="row-title">${esc(e.title)}</span>
+        <span class="countdown ${cd.past?'cd-past':cd.urgent?'cd-urgent':'cd-ok'}">${ic('timer')} ${cd.text}</span>
+      </div>
+      ${book?`<div class="info-line">${ic('book')}<span>کتاب: <b>${esc(book.title)}</b></span></div>`:''}
+      <div class="info-line">${ic('calendar')}<span>${persianDays[(d.getDay()+1)%7]}، ${toPersianNumber(jd)} ${persianMonths[jm-1]} ${toPersianNumber(jy)}</span></div>
+      ${e.topics?`<div class="info-line topics">${ic('list')}<span>مطالب امتحان: ${esc(e.topics)}</span></div>`:''}
+      ${e.note?`<div class="info-line note">${ic('bulb')}<span>${esc(e.note)}</span></div>`:''}
+    </div>
+    <button class="icon-btn" title="حذف" onclick="${delFn}">${ic('trash')}</button>
+  </div>`;
+}
+function switchExamTab(tab){ state.ui.examTab=tab; renderExams(); }
+function changeExamSubject(id){ state.ui.examSubject=id; renderExams(); }
+function openExamModal(){
+  const subject=state.subjects.find(s=>s.id===state.ui.examSubject);
+  const t=new Date(); const [jy,jm,jd]=gregorianToJalali(t.getFullYear(),t.getMonth()+1,t.getDate());
+  const body = `
+    ${field('عنوان امتحان', `<input class="inp" type="text" id="examTitle" placeholder="مثلاً امتحان میان‌ترم از درس یک">`)}
+    ${field('تاریخ امتحان', jaliInput('exDate',jy,jm,jd))}
+    ${field('مطالب امتحان', `<textarea class="inp" id="examTopics" placeholder="مثلاً فصل ۱ تا ۳، تمرین‌های صفحه ۲۰ تا ۵۰"></textarea>`)}
+    ${field('نکته', `<textarea class="inp" id="examNote" placeholder="نکات مهم برای آمادگی (اختیاری)"></textarea>`)}`;
+  const foot = `<button class="btn primary" onclick="saveExam()">${ic('check')} ذخیره امتحان</button>
+                <button class="btn ghost" onclick="closeModal()">انصراف</button>`;
+  openModalHTML(modalShell(`امتحان جدید — ${esc(subject.name)}`,'checkSquare',body,foot));
+}
+function saveExam(){
+  const title=document.getElementById('examTitle').value.trim();
+  const topics=document.getElementById('examTopics').value.trim();
+  const note=document.getElementById('examNote').value.trim();
+  const date=readJali('exDate');
+  if(!title){ alert('عنوان الزامی است.'); return; }
+  if(!date){ alert('تاریخ امتحان را کامل وارد کنید.'); return; }
+  const sid=state.ui.examSubject;
+  if(!state.exams[sid]) state.exams[sid]=[];
+  state.exams[sid].push({id:generateId(), title, topics, note, date:jaliToDate(date).toISOString()});
+  closeModal(); renderExams(); updateNavBadges();
+}
+function deleteExam(sid,id){
+  if(!confirm('این امتحان حذف شود؟')) return;
+  state.exams[sid]=state.exams[sid].filter(e=>e.id!==id);
+  renderExams(); updateNavBadges();
+}
+function openHalfHourExamModal(){
+  if(state.halfHour.books.length===0){ alert('ابتدا از بخش نیم‌ساعته یک کتاب ثبت کنید.'); return; }
+  const t=new Date(); const [jy,jm,jd]=gregorianToJalali(t.getFullYear(),t.getMonth()+1,t.getDate());
+  const body = `
+    ${field('عنوان امتحان', `<input class="inp" type="text" id="hhTitle" placeholder="مثلاً پرسش کلاسی از کتاب">`)}
+    ${field('کتاب مرتبط', selectInput('hhBook', state.halfHour.books.map(b=>({v:b.id,t:b.title}))))}
+    ${field('تاریخ امتحان', jaliInput('hhDate',jy,jm,jd))}
+    ${field('مطالب امتحان', `<textarea class="inp" id="hhTopics" placeholder="مثلاً صفحات ۱۰ تا ۳۰"></textarea>`)}
+    ${field('نکته', `<textarea class="inp" id="hhNote" placeholder="اختیاری"></textarea>`)}`;
+  const foot = `<button class="btn primary" onclick="saveHalfHourExam()">${ic('check')} ذخیره امتحان</button>
+                <button class="btn ghost" onclick="closeModal()">انصراف</button>`;
+  openModalHTML(modalShell('امتحان جدید — نیم‌ساعته','openBook',body,foot));
+}
+function saveHalfHourExam(){
+  const title=document.getElementById('hhTitle').value.trim();
+  const bookId=document.getElementById('hhBook').value;
+  const topics=document.getElementById('hhTopics').value.trim();
+  const note=document.getElementById('hhNote').value.trim();
+  const date=readJali('hhDate');
+  if(!title){ alert('عنوان الزامی است.'); return; }
+  if(!date){ alert('تاریخ امتحان را کامل وارد کنید.'); return; }
+  state.halfHour.exams.push({id:generateId(), title, bookId, topics, note, date:jaliToDate(date).toISOString()});
+  closeModal(); renderExams(); updateNavBadges();
+}
+function deleteHalfHourExam(id){
+  if(!confirm('این امتحان حذف شود؟')) return;
+  state.halfHour.exams=state.halfHour.exams.filter(e=>e.id!==id);
+  renderExams(); updateNavBadges();
+}
+
+/* ================= نیم‌ساعته ================= */
+function renderHalfHour(){
+  const el=document.getElementById('halfhourContent');
+  const books=state.halfHour.books;
+  const finished=books.filter(b=>b.readPages>=b.totalPages).length;
+  const pagesRead=books.reduce((s,b)=>s+b.readPages,0);
+  let items='';
+  if(books.length===0){
+    items=`<div class="empty-mini">${ic('openBook')}<p>هنوز کتابی ثبت نشده است؛ اولین کتاب خود را اضافه کنید</p></div>`;
+  } else {
+    books.forEach(b=>{
+      const pct=Math.round(b.readPages/b.totalPages*100);
+      const fin=b.readPages>=b.totalPages;
+      items += `
+      <div class="row-item book-row ${fin?'finished':''}">
+        <div class="book-cover">${ic('openBook')}</div>
+        <div class="row-body">
+          <div class="row-top">
+            <span class="row-title">${esc(b.title)}</span>
+            ${fin?`<span class="badge-done">${ic('checkCircle')} به اتمام رسید</span>`:`<span class="badge-read">${toPersianNumber(pct)}٪ مطالعه شده</span>`}
+          </div>
+          <div class="progress-wrap">
+            <div class="progress"><i style="width:${pct}%"></i></div>
+            <div class="progress-txt">${toPersianNumber(b.readPages)} از ${toPersianNumber(b.totalPages)} صفحه مطالعه شده</div>
+          </div>
+          <div class="row-actions">
+            ${fin?'':`<button class="btn ghost sm" onclick="openReadModal('${b.id}')">${ic('plus')} ثبت مطالعه</button>`}
+            <button class="icon-btn" title="حذف" onclick="deleteBook('${b.id}')">${ic('trash')}</button>
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+  el.innerHTML = `
+    <div class="toolbar">
+      <div class="tb-right">
+        <div class="tb-icon">${ic('openBook')}</div>
+        <div class="tb-title"><h3>کتاب‌های نیم‌ساعته</h3>
+        <p>ثبت و پیگیری مطالعه آزاد روزانه</p></div>
+      </div>
+      <div class="tb-actions"><button class="btn primary" onclick="openBookModal()">${ic('plus')} کتاب جدید</button></div>
+    </div>
+    <div class="stats">
+      ${statBox('book','کل کتاب‌ها',books.length,'var(--purple)','rgba(155,89,182,.15)')}
+      ${statBox('clock','در حال مطالعه',books.length-finished,'var(--blue)','rgba(74,144,226,.12)')}
+      ${statBox('checkCircle','اتمام‌شده',finished,'var(--green)','rgba(46,204,113,.12)')}
+      ${statBox('openBook','صفحات خوانده‌شده',pagesRead,'var(--gold)','rgba(212,175,55,.12)')}
+    </div>
+    <div class="rows">${items}</div>`;
+}
+function openBookModal(){
+  const body = `
+    ${field('عنوان کتاب', `<input class="inp" type="text" id="bookTitle" placeholder="مثلاً تاریخ بیهقی">`)}
+    ${field('تعداد صفحات', `<input class="inp" type="number" id="bookPages" min="1" placeholder="مثلاً ۲۵۰">`)}`;
+  const foot = `<button class="btn primary" onclick="saveBook()">${ic('plus')} افزودن کتاب</button>
+                <button class="btn ghost" onclick="closeModal()">انصراف</button>`;
+  openModalHTML(modalShell('کتاب جدید','openBook',body,foot));
+}
+function saveBook(){
+  const title=document.getElementById('bookTitle').value.trim();
+  const pages=parseInt(document.getElementById('bookPages').value);
+  if(!title){ alert('عنوان الزامی است.'); return; }
+  if(!pages || pages<1){ alert('تعداد صفحات معتبر وارد کنید.'); return; }
+  state.halfHour.books.push({id:generateId(), title, totalPages:pages, readPages:0});
+  closeModal(); renderHalfHour(); updateNavBadges();
+}
+function openReadModal(id){
+  const b=state.halfHour.books.find(x=>x.id===id); if(!b) return;
+  const remaining=b.totalPages-b.readPages;
+  const pct=Math.round(b.readPages/b.totalPages*100);
+  const quick=[5,10,15,20,30].filter(n=>n<=remaining);
+  const body = `
+    <div class="read-now">
+      <div class="progress"><i style="width:${pct}%"></i></div>
+      <p>${toPersianNumber(b.readPages)} از ${toPersianNumber(b.totalPages)} صفحه مطالعه شده — ${toPersianNumber(remaining)} صفحه باقی مانده</p>
+    </div>
+    ${field('تعداد صفحات مطالعه‌شده در این جلسه', `<input class="inp" type="number" id="readCount" min="1" max="${remaining}" placeholder="مثلاً ۲۰">`)}
+    ${quick.length?`<div class="quick-adds">${quick.map(n=>`<button type="button" class="q-add" onclick="document.getElementById('readCount').value=${n}">${toPersianNumber(n)} صفحه</button>`).join('')}</div>`:''}`;
+  const foot = `<button class="btn primary" onclick="confirmRead('${id}')">${ic('check')} ثبت مطالعه</button>
+                <button class="btn ghost" onclick="closeModal()">انصراف</button>`;
+  openModalHTML(modalShell(`ثبت مطالعه — ${esc(b.title)}`,'openBook',body,foot));
+}
+function confirmRead(id){
+  const count=parseInt(document.getElementById('readCount').value);
+  const b=state.halfHour.books.find(x=>x.id===id);
+  if(!count || count<1){ alert('تعداد صفحات معتبر وارد کنید.'); return; }
+  b.readPages=Math.min(b.totalPages, b.readPages+count);
+  closeModal(); renderHalfHour(); updateNavBadges();
+}
+function deleteBook(id){
+  if(!confirm('با حذف این کتاب، امتحانات مرتبط با آن نیز حذف می‌شوند. ادامه می‌دهید؟')) return;
+  state.halfHour.books=state.halfHour.books.filter(b=>b.id!==id);
+  state.halfHour.exams=state.halfHour.exams.filter(e=>e.bookId!==id);
+  renderHalfHour(); renderExams(); updateNavBadges();
+}
+
+/* ================= برنامه‌های درسی ================= */
+function renderCourses(){
+  const el=document.getElementById('coursesContent');
+  if(state.subjects.length===0){
+    el.innerHTML = `<div class="card empty">
+      <div class="empty-ic">${ic('layers')}</div>
+      <h3>برنامه‌های درسی</h3>
+      <p>برای ثبت برنامه مطالعاتی، ابتدا دروس خود را تعریف کنید. دروس تعریف‌شده در بخش تکالیف، اینجا نیز قابل انتخاب هستند.</p>
+      <button class="btn primary" onclick="openSubjectsModal()">${ic('plus')} ایجاد درس</button>
+    </div>`;
+    return;
+  }
+  if(!state.ui.coursesSubject || !state.subjects.some(s=>s.id===state.ui.coursesSubject)) state.ui.coursesSubject=state.subjects[0].id;
+  const subject=state.subjects.find(s=>s.id===state.ui.coursesSubject);
+  const plans=state.coursePlans[subject.id]||[];
+  const done=plans.filter(p=>p.done).length;
+  const overdue=plans.filter(p=>!p.done && new Date(p.dueDate)<new Date()).length;
+  let items='';
+  if(plans.length===0){
+    items=`<div class="empty-mini">${ic('file')}<p>هیچ برنامه‌ای برای «${esc(subject.name)}» ثبت نشده است</p></div>`;
+  } else {
+    plans.forEach(p=>{
+      const due=new Date(p.dueDate);
+      const overdueItem=!p.done && due<new Date();
+      items += `
+      <div class="row-item ${p.done?'done':''} ${overdueItem?'late':''}">
+        <label class="check">
+          <input type="checkbox" ${p.done?'checked':''} onchange="toggleCoursePlan('${subject.id}','${p.id}')">
+          <span class="mark">${ic('check')}</span>
+        </label>
+        <div class="row-body">
+          <div class="row-top"><span class="row-title">${esc(p.title)}</span></div>
+          ${p.desc?`<p class="row-desc">${esc(p.desc)}</p>`:''}
+          <div class="chips">
+            <span class="chip ${overdueItem?'danger':''}">${ic('calendar')} مهلت: ${formatJalali(due)}</span>
+            ${overdueItem?`<span class="chip danger">${ic('alert')} گذشته از مهلت</span>`:''}
+            ${p.done?`<span class="chip ok">${ic('checkCircle')} انجام شد</span>`:''}
+          </div>
+        </div>
+        <button class="icon-btn" title="حذف" onclick="deleteCoursePlan('${subject.id}','${p.id}')">${ic('trash')}</button>
+      </div>`;
+    });
+  }
+  el.innerHTML = `
+    <div class="toolbar">
+      <div class="tb-right">
+        <div class="tb-icon">${ic('file')}</div>
+        <div class="tb-title"><h3>برنامه‌های درسی — ${esc(subject.name)}</h3>
+        <p>${toPersianNumber(plans.length-done)} برنامه باقی‌مانده از ${toPersianNumber(plans.length)}</p></div>
+      </div>
+      <div class="tb-actions">
+        <div class="select">
+          <select onchange="changeCoursesSubject(this.value)">
+            ${state.subjects.map(s=>`<option value="${s.id}" ${s.id===subject.id?'selected':''}>${esc(s.name)}</option>`).join('')}
+          </select>${ic('chevDown')}
+        </div>
+        <button class="btn primary" onclick="openCoursePlanModal()">${ic('plus')} برنامه جدید</button>
+      </div>
+    </div>
+    <div class="stats">
+      ${statBox('list','کل برنامه‌ها',plans.length,'var(--orange)','rgba(243,156,18,.12)')}
+      ${statBox('checkCircle','انجام‌شده',done,'var(--green)','rgba(46,204,113,.12)')}
+      ${statBox('clock','باقی‌مانده',plans.length-done,'var(--gold)','rgba(212,175,55,.12)')}
+      ${statBox('alert','گذشته از مهلت',overdue,'var(--red)','rgba(231,76,60,.12)')}
+    </div>
+    <div class="rows">${items}</div>`;
+}
+function changeCoursesSubject(id){ state.ui.coursesSubject=id; renderCourses(); }
+function openCoursePlanModal(){
+  const subject=state.subjects.find(s=>s.id===state.ui.coursesSubject);
+  const t=new Date(); const [jy,jm,jd]=gregorianToJalali(t.getFullYear(),t.getMonth()+1,t.getDate());
+  const body = `
+    ${field('عنوان برنامه', `<input class="inp" type="text" id="planTitle" placeholder="مثلاً مطالعه کامل فصل دوم">`)}
+    ${field('توضیحات', `<textarea class="inp" id="planDesc" placeholder="جزئیات برنامه (اختیاری)"></textarea>`)}
+    ${field('مهلت انجام', jaliInput('plDue',jy,jm,jd))}`;
+  const foot = `<button class="btn primary" onclick="saveCoursePlan()">${ic('check')} ذخیره برنامه</button>
+                <button class="btn ghost" onclick="closeModal()">انصراف</button>`;
+  openModalHTML(modalShell(`برنامه جدید — ${esc(subject.name)}`,'file',body,foot));
+}
+function saveCoursePlan(){
+  const title=document.getElementById('planTitle').value.trim();
+  const desc=document.getElementById('planDesc').value.trim();
+  const due=readJali('plDue');
+  if(!title){ alert('عنوان الزامی است.'); return; }
+  if(!due){ alert('تاریخ مهلت را کامل وارد کنید.'); return; }
+  const sid=state.ui.coursesSubject;
+  if(!state.coursePlans[sid]) state.coursePlans[sid]=[];
+  state.coursePlans[sid].push({id:generateId(), title, desc, dueDate:jaliToDate(due).toISOString(), done:false});
+  closeModal(); renderCourses(); updateNavBadges();
+}
+function toggleCoursePlan(sid,id){
+  const p=state.coursePlans[sid].find(x=>x.id===id);
+  if(p) p.done=!p.done;
+  renderCourses(); updateNavBadges();
+}
+function deleteCoursePlan(sid,id){
+  if(!confirm('این برنامه حذف شود؟')) return;
+  state.coursePlans[sid]=state.coursePlans[sid].filter(p=>p.id!==id);
+  renderCourses(); updateNavBadges();
+}
+
+/* ================= شروع ================= */
+renderAll();
+</script>
 </body>
 </html>
